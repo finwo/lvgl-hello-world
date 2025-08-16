@@ -72,6 +72,7 @@ lib/.dep/config.mk:
 	$(CC) $< $(CFLAGS) -c -o $@
 
 output/${BIN}: ${OBJ}
+	mkdir -p $(shell dirname $@)
 	$(CPP) $(OBJ) $(CPPFLAGS) $(LDFLAGS) -s -o $@
 	cp /usr/local/x86_64-w64-mingw32/bin/SDL2.dll output/SDL2.dll
 
