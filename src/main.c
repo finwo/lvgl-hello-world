@@ -31,6 +31,8 @@ extern "C" {
 #include "util/get_bin_path.h"
 #include "util/fs.h"
 
+#include "assets/sono.h"
+
 // #include "AppModule/appmodule.h"
 
 lv_display_t *lvDisplay;
@@ -81,23 +83,23 @@ int app_setup() {
   // Set background to recognizable color
   lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x2255AA), LV_PART_MAIN);
 
-  // Check if we can load the font
-  char *font_file;
-  // asprintf(&font_file, "%s/public-pixel.ttf", appDir);
-  asprintf(&font_file, "%s/sono.ttf", appDir);
-  log_debug("Target font file: %s\n", font_file);
-  if (!file_exists(font_file, "r")) {
-    log_fatal("Font file could not be read");
-    exit(1);
-  }
+  // // Check if we can load the font
+  // char *font_file;
+  // // asprintf(&font_file, "%s/public-pixel.ttf", appDir);
+  // asprintf(&font_file, "%s/sono.ttf", appDir);
+  // log_debug("Target font file: %s\n", font_file);
+  // if (!file_exists(font_file, "r")) {
+  //   log_fatal("Font file could not be read");
+  //   exit(1);
+  // }
 
-  // Actually load the font
-  int font_size = 24;
-  struct buf *font_data = file_get_contents(font_file);
-  lv_font_t *customFont = lv_tiny_ttf_create_data(font_data->data, font_data->len, font_size);
+  // // Actually load the font
+  // int font_size = 24;
+  // struct buf *font_data = file_get_contents(font_file);
+  // lv_font_t *customFont = lv_tiny_ttf_create_data(font_data->data, font_data->len, font_size);
   lv_style_t *fontStyle = calloc(1, sizeof(lv_style_t));
   lv_style_init(fontStyle);
-  lv_style_set_text_font(fontStyle, customFont);
+  lv_style_set_text_font(fontStyle, &sono);
   lv_style_set_text_color(fontStyle, lv_color_hex(0xFFFFFF));
   lv_obj_add_style(lv_screen_active(), fontStyle, 0);
 

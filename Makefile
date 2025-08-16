@@ -17,6 +17,10 @@ DEPS+=$(wildcard src/*/components/*/*.xml)
 DEPS+=$(wildcard target/${TARGET}/src/*.c)
 DEPS+=target/${TARGET}/src/lv_conf.h
 
+fontFiles:=
+fontFiles+=src/assets/public-pixel.ttf
+fontFiles+=src/assets/sono.ttf
+
 .PHONY: default
 default: build/output/${BIN}
 
@@ -25,6 +29,11 @@ build: ${DEPS}
 	cp --force --recursive --preserve=all src build/
 	cp --force --recursive --preserve=all lib build/
 	cp --force --recursive --preserve=all target/${TARGET}/* build/
+	for fontFile in ${fontFiles}; do \
+		mkdir -p build/$$(dirname $$(echo $$fontFile | cut -d "/" -f 3-)) ; \
+		npx -y lv_font_conv --font $$fontFile -r 0x20-0x7F --size 24 --format lvgl --bpp 4 --no-compress --lv-font-name $$(basename $${fontFile%.*} | tr "-" "_") -o build/$${fontFile%.*}.h ; \
+		gawk -i inplace 'NR < 15 || NR > 17' build/$${fontFile%.*}.h ; \
+	done
 
 build/output/${BIN}: build
 	${MAKE} --directory build/ -j
