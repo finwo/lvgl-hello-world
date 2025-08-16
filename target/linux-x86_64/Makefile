@@ -89,7 +89,7 @@ includeFiles:=
 # includeFiles+=src/AppModule/assets/global.json
 # includeFiles+=src/AppModule/assets/offline-resources-1x.png
 # includeFiles+=src/AppModule/assets/offline-resources-2x.png
-includeFiles+=src/assets/public-pixel.ttf
+# includeFiles+=src/assets/public-pixel.ttf
 # includeFiles+=$(wildcard src/*/screens/*.xml)
 
 .PHONY: default
