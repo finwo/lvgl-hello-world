@@ -8,6 +8,39 @@ on:
 
 jobs:
 
+  build-macos:
+    name: Build and upload macos artifact
+    runs-on: macos-arm64
+    strategy:
+      matrix:
+        include:
+          - target: darwin-arm64
+            cc: gcc
+            cpp: g++
+    steps:
+      - uses: actions/checkout@v3
+      - uses: finwo/dep@main
+        name: Install dep
+      - name: Install build dependencies
+        run: |
+         echo TODO
+      - name: Install application dependencies
+        run: |
+          dep install
+      - name: Build
+        run: |
+          make -j CC=${{ matrix.cc }} CPP=${{ matrix.cpp }} TARGET=${{ matrix.target }}
+          cd build/output
+          zip -r hello-world-${{ matrix.target }}.zip hello-world.app
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/output/hello-world-${{ matrix.target }}.zip
+          file_glob: true
+          overwrite: true
+          tag: ${{ github.ref }}
+
   build-windows:
     name: Build and upload windows artifact
     runs-on: ubuntu-latest
