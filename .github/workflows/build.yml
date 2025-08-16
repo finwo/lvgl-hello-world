@@ -23,7 +23,7 @@ jobs:
         name: Install dep
       - name: Install build dependencies
         run: |
-         echo TODO
+          yes | brew install coreutils zip
       - name: Install application dependencies
         run: |
           dep install
