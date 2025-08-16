@@ -5,9 +5,12 @@ SRC:=
 BIN?=hello-world
 INCLUDES:=
 
+APPNAME=hello-world.app
+
 UNAME_MACHINE=$(call lc,$(shell uname -m))
 UNAME_SYSTEM=$(call lc,$(shell uname -s))
 
+CP=$(shell command -v gcp cp | head -1)
 CC:=clang
 CPP:=clang
 
@@ -94,7 +97,7 @@ includeFiles:=
 # includeFiles+=$(wildcard src/*/screens/*.xml)
 
 .PHONY: default
-default: output/$(BIN) output/assets
+default: output/$(APPNAME)/Contents/MacOS/$(BIN) output/$(APPNAME)/Contents/Resources
 
 $(OBJ):
 
@@ -107,14 +110,16 @@ lib/.dep/config.mk:
 .c.o:
 	$(CC) $< $(CFLAGS) -c -o $@
 
-output/${BIN}: ${OBJ}
-	mkdir -p $(shell dirname $@)
+output/$(APPNAME)/Contents/MacOS/${BIN}: ${OBJ}
+	rm -rf $(shell dirname $@)
+	mkdir -p output/
+	$(CP) --recursive template/hello-world.app output/$(APPNAME)
 	$(CPP) $(OBJ) $(CPPFLAGS) $(LDFLAGS) -s -o $@
 
-output/assets: ${includeFiles}
+output/$(APPNAME)/Contents/Resources: ${includeFiles}
 	for asset in ${includeFiles}; do \
-		mkdir -p output/$$(dirname $$(echo $$asset | cut -d "/" -f 3-)) ; \
-		cp $$asset output/$$(dirname $$(echo $$asset | cut -d "/" -f 3-)) ; \
+		mkdir -p output/$(APPNAME)/Contents/Resources/$$(dirname $$(echo $$asset | cut -d "/" -f 3-)) ; \
+		cp $$asset output/$(APPNAME)/Contents/Resources/$$(dirname $$(echo $$asset | cut -d "/" -f 3-)) ; \
 	done
 
 .PHONY: clean
