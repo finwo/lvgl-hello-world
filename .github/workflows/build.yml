@@ -30,7 +30,10 @@ jobs:
       - name: Build
         run: |
           make -j CC=${{ matrix.cc }} CPP=${{ matrix.cpp }} TARGET=${{ matrix.target }}
-          cd build/output
+          cd build/output/hello-world.app/Contents/MacOS
+          install_name_tool -change /opt/homebrew/opt/sdl2/lib/libSDL2-2.0.0.dylib @executable_path/libsdl2.dylib hello-world
+          cp /opt/homebrew/opt/sdl2/lib/libSDL2-2.0.0.dylib libsdl2.dylib
+          cd ../../..
           zip -r hello-world-${{ matrix.target }}.zip hello-world.app
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
