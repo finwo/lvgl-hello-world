@@ -5,9 +5,17 @@ UNAME_SYSTEM=$(call lc,$(shell uname -s))
 
 TARGET=${UNAME_SYSTEM}-${UNAME_MACHINE}
 
-CP=$(shell command -v gcp cp | head -1)
+CP:=$(shell bash -c "command -v gcp cp" | head -1)
 
 BIN?=hello-world
+EXEC?=
+ifeq ($(OS),Windows_NT)
+BIN=hello-world.exe
+endif
+ifeq ($(UNAME_SYSTEM),darwin)
+BIN=hello-world.app
+EXEC=open
+endif
 
 DEPS:=
 DEPS+=$(wildcard src/*.c)
@@ -41,8 +49,8 @@ build/output/${BIN}: build
 	${MAKE} --directory build/ -j
 
 .PHONY: start
-start: build/output/${BIN}
-	build/output/${BIN}
+start: build/output
+	${EXEC} build/output/${BIN}
 
 .PHONY: clean
 clean:
