@@ -1,0 +1,162 @@
+---
+
+name: Build
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+
+  build-windows:
+    name: Build and upload windows artifact
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: windows-x86_64
+            cc: x86_64-w64-mingw32-gcc
+            cpp: x86_64-w64-mingw32-g++
+    steps:
+      - uses: actions/checkout@v3
+      - uses: finwo/dep@main
+        name: Install dep
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -yq
+          sudo apt-get install -yq build-essential zip mingw-w64 mingw-w64-tools wget
+          sudo mkdir /usr/local/{i686,x86_64}-w64-mingw32
+          wget https://github.com/libsdl-org/SDL/releases/download/release-2.32.8/SDL2-devel-2.32.8-mingw.tar.gz
+          tar xzvf SDL2-devel-2.32.8-mingw.tar.gz
+          cd SDL2-2.32.8
+          sudo make cross
+          cd ..
+
+      - name: Install application dependencies
+        run: |
+          dep install
+
+      - name: Build
+        run: |
+          make -j CC=${{ matrix.cc }} CPP=${{ matrix.cpp }} TARGET=${{ matrix.target }}
+          cd build
+          mv output hello-world
+          zip -r hello-world-${{ matrix.target }}.zip hello-world
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/hello-world-${{ matrix.target }}.zip
+          file_glob: true
+          overwrite: true
+          tag: ${{ github.ref }}
+
+  # build-windows:
+  #   name: Build and upload windows artifact
+  #   runs-on: windows-latest
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - target: windows-x86_64
+  #           cc: gcc
+  #           cpp: g++
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - shell: bash
+  #       run: |
+  #         echo "/c/msys64/mingw64/bin" >> $GITHUB_PATH
+  #     - uses: finwo/dep@main
+  #       name: Install dep
+  #     - name: Install dependencies
+  #       shell: bash
+  #       run: dep install
+  #     - name: Build
+  #       shell: bash
+  #       run: |
+  #         make -j CC=${{ matrix.cc }} CPP=${{ matrix.cpp }} TARGET=${{ matrix.target }}
+  #         cd build
+  #         mv output hello-world
+  #         7z a hello-world-${{ matrix.target }}.zip hello-world
+  #     - name: Upload binaries to release
+  #       uses: svenstaro/upload-release-action@v2
+  #       with:
+  #         repo_token: ${{ secrets.GITHUB_TOKEN }}
+  #         file: build/hello-world-${{ matrix.target }}.zip
+  #         file_glob: true
+  #         overwrite: true
+  #         tag: ${{ github.ref }}
+
+  build-linux:
+    name: Build and upload linux artifact
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+
+          # - target: linux-aarch64
+          #   arch: aarch64
+          #   cc: gcc
+          #   cpp: g++
+
+          # - target: linux-armv7
+          #   arch: armv7
+          #   cc: gcc
+          #   cpp: g++
+
+          # - target: linux-riscv64
+          #   arch: riscv64
+          #   cc: gcc
+          #   cpp: g++
+
+          - target: linux-x86_64
+            arch: none
+            cc: gcc
+            cpp: g++
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: finwo/dep@main
+        name: Install dep
+
+      - name: Install dependencies
+        shell: bash
+        run: dep install
+
+      - if: ${{ matrix.arch != 'none' }}
+        uses: uraimo/run-on-arch-action@v2
+        name: Build
+        id: runcmd
+        with:
+          arch: ${{ matrix.arch }}
+          distro: ubuntu_latest
+          githubToken: ${{ github.token }}
+
+          install: |
+            apt-get update -y
+            apt-get install -yq build-essential libglib2.0-dev libsdl2-dev zip
+
+          run: |
+            make -j CC=${{ matrix.cc }} CPP=${{ matrix.cpp }} TARGET=${{ matrix.target }}
+
+      - if: ${{ matrix.arch == 'none' }}
+        name: Build
+        shell: bash
+        run: |
+          sudo apt-get update -yq
+          sudo apt-get install -yq build-essential libglib2.0-dev libsdl2-dev zip
+          make -j CC=${{ matrix.cc }} CPP=${{ matrix.cpp }} TARGET=${{ matrix.target }}
+          cd build
+          mv output hello-world
+          zip -r hello-world-${{ matrix.target }}.zip hello-world
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/hello-world-${{ matrix.target }}.zip
+          file_glob: true
+          overwrite: true
+          tag: ${{ github.ref }}
