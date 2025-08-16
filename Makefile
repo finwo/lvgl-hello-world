@@ -19,7 +19,6 @@ DEPS+=target/${TARGET}/src/lv_conf.h
 
 fontFiles:=
 fontFiles+=src/assets/public-pixel.ttf
-fontFiles+=src/assets/sono.ttf
 
 .PHONY: default
 default: build/output/${BIN}

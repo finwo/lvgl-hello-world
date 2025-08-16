@@ -31,7 +31,7 @@ extern "C" {
 #include "util/get_bin_path.h"
 #include "util/fs.h"
 
-#include "assets/sono.h"
+#include "assets/public-pixel.h"
 
 // #include "AppModule/appmodule.h"
 
@@ -85,8 +85,7 @@ int app_setup() {
 
   // // Check if we can load the font
   // char *font_file;
-  // // asprintf(&font_file, "%s/public-pixel.ttf", appDir);
-  // asprintf(&font_file, "%s/sono.ttf", appDir);
+  // asprintf(&font_file, "%s/public-pixel.ttf", appDir);
   // log_debug("Target font file: %s\n", font_file);
   // if (!file_exists(font_file, "r")) {
   //   log_fatal("Font file could not be read");
@@ -99,7 +98,7 @@ int app_setup() {
   // lv_font_t *customFont = lv_tiny_ttf_create_data(font_data->data, font_data->len, font_size);
   lv_style_t *fontStyle = calloc(1, sizeof(lv_style_t));
   lv_style_init(fontStyle);
-  lv_style_set_text_font(fontStyle, &sono);
+  lv_style_set_text_font(fontStyle, &public_pixel);
   lv_style_set_text_color(fontStyle, lv_color_hex(0xFFFFFF));
   lv_obj_add_style(lv_screen_active(), fontStyle, 0);
 
