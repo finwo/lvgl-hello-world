@@ -5,6 +5,8 @@ UNAME_SYSTEM=$(call lc,$(shell uname -s))
 
 TARGET=${UNAME_SYSTEM}-${UNAME_MACHINE}
 
+CP=$(shell command -v gcp cp | head -1)
+
 BIN?=hello-world
 
 DEPS:=
@@ -25,13 +27,14 @@ default: build/output/${BIN}
 
 build: ${DEPS}
 	mkdir -p build
-	cp --force --recursive --preserve=all src build/
-	cp --force --recursive --preserve=all lib build/
-	cp --force --recursive --preserve=all target/${TARGET}/* build/
+	${CP} --force --recursive --preserve=all src build/
+	${CP} --force --recursive --preserve=all lib build/
+	${CP} --force --recursive --preserve=all target/${TARGET}/* build/
 	for fontFile in ${fontFiles}; do \
 		mkdir -p build/$$(dirname $$(echo $$fontFile | cut -d "/" -f 3-)) ; \
 		npx -y lv_font_conv --font $$fontFile -r 0x20-0x7F --size 24 --format lvgl --bpp 4 --no-compress --lv-font-name $$(basename $${fontFile%.*} | tr "-" "_") -o build/$${fontFile%.*}.h ; \
-		gawk -i inplace 'NR < 15 || NR > 17' build/$${fontFile%.*}.h ; \
+		awk 'NR < 15 || NR > 17' build/$${fontFile%.*}.h > build/$${fontFile%.*}.h.new ; \
+		mv build/$${fontFile%.*}.h.new build/$${fontFile%.*}.h ; \
 	done
 
 build/output/${BIN}: build

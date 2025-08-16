@@ -4,6 +4,8 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
+#elif defined(__APPLE__)
+#include <unistd.h>
 #else
 #include <unistd.h>
 #include <linux/limits.h>
