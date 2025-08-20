@@ -19,11 +19,11 @@ jobs:
             cpp: g++
     steps:
       - uses: actions/checkout@v3
-      - uses: finwo/dep@main
-        name: Install dep
       - name: Install build dependencies
         run: |
           yes | brew install coreutils sdl2 zip
+      - uses: finwo/dep@main
+        name: Install dep
       - name: Install application dependencies
         run: |
           dep install

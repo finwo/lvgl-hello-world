@@ -114,6 +114,7 @@ output/$(APPNAME)/Contents/MacOS/${BIN}: ${OBJ}
 	rm -rf $(shell dirname $@)
 	mkdir -p output/
 	$(CP) --recursive template/hello-world.app output/$(APPNAME)
+	mkdir -p $(shell dirname $@)
 	$(CPP) $(OBJ) $(CPPFLAGS) $(LDFLAGS) -s -o $@
 
 output/$(APPNAME)/Contents/Resources: ${includeFiles}
